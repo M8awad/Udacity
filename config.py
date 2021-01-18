@@ -1,3 +1,15 @@
-a4���hM7Q�|c5W0��5YK-�5��
-β�>�{���	gh�d�P���OU��0�e�8f��oӇ���ьB�ޠMo��
-l��EjB�C$r��������t�xU����zb��p_���" � ]�e`���P��N���]D�%����bm6c�,���ۆ�_ؼ�.��C��q��F=>���8.�STz	0��G��=e��}�r�Ʀ�`o���E��k��z�a��ޘ�W����3�.�wj�Џż5�z�����	!J��df��!ݳ�{i�E��l�S
+import os
+SECRET_KEY = os.urandom(32)
+# Grabs the folder where the script runs.
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+# Enable debug mode.
+DEBUG = True
+
+# Connect to the database
+
+
+SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:postgres@localhost:5432/fyyur'
+
+# remove console warning
+SQLALCHEMY_TRACK_MODIFICATIONS = False
