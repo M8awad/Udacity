@@ -9,8 +9,10 @@ import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
-from flask_migrate import Migrate
+from flask_migrate import Migrate, MigrateCommand
 from datetime import datetime
+from flask_script import Manager
+
 
 
 
@@ -22,6 +24,7 @@ moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 migration = Migrate(app, db)
+manager.add_command('db',MigrateCommand)
 
 
 class Venue(db.Model):
@@ -46,8 +49,10 @@ class Venue(db.Model):
                             cascade="save-update, merge, delete")
 
 
-  def __repr__(self):
-     return '<Venue {}>'.format(self.name)                        
+    def __repr__(self):
+      return f'<Venue {self.id} name: {self.name}>'
+   
+                           
 
 
 class Artist(db.Model):
@@ -77,7 +82,7 @@ class Artist(db.Model):
 
 
 #Class Show
-  class Show(db.Model):
+class Show(db.Model):
     __tablename__ = 'shows'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -88,7 +93,8 @@ class Artist(db.Model):
     upcoming = db.Column(db.Boolean, nullable=False, default=True)
 
     def __repr__(self):
-    return '<Show {}{}>'.format(self.artist_id, self.venue_id) 
+      return f'<Show {self.id}, Artist {self.artist_id}, Venue {self.venue_id}>'
+
 
 
 
@@ -96,7 +102,7 @@ class Artist(db.Model):
 
 
 #filters
-  def format_datetime(value, format='medium'):
+def format_datetime(value, format='medium'):
     date = dateutil.parser.parse(value)
     if format == 'full':
         format="EEEE MMMM, d, y 'at' h:mma"
@@ -159,7 +165,8 @@ def search_venues():
   # seach for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
  search_term = request.form.get('search_term',None)
- result = Venue.query.filter(Venue.name.ilike("%{}%").format(search_term))).all()
+ result = Venue.query.filter(Venue.name.ilike("%{}%").format(search_term)).all()
+                                                     
 
  response = {
    "count" : result.count(),
@@ -237,19 +244,19 @@ def create_venue_submission():
       seeking_talent = form.seeking_talent.data,
       seeking_description = form.seeking_description.data,
       image_link = form.image_link.data
-    )
+      )
     db.session.add(new_venue)
     db.session.commit()
     #on successful db insert, flash success
     flash('Venue'+ form.name.data + 'successfuly added')
-    except:
+  except:
       #on failure , Error = true and will flash ERRORRRR with the venue name
       error = True
       flash('an error occurred. venue' + form.name.data +'ERRORRR!')
-    finally:
+  finally:
       #close session and render the template!
       db.session.Close()
-    return render_template('pages/home.html')  
+  return render_template('pages/home.html')  
 
   
 
@@ -301,8 +308,8 @@ def search_artists():
     response['data'].append({
       "id": artist.id,
       "name": artist.name,
-      "num_upcoming_shows": len(db.session.query(Show).filter(Show.artist_id == artist.id).filter(Show.start_time > datetime.now().all())
-      })
+      "num_upcoming_shows": len(db.session.query(Show).filter(Show.artist_id == result.id).filter(Show.start_time > datetime.now()).all()),
+    })
   return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
 
     
@@ -346,7 +353,7 @@ def show_artist(artist_id):
       "past_shows_count": len(past_show),
       "upcoming_shows_count": len(upcoming_shows)
     }
-    return render_template('pages/show_artist.html', artist=data)
+      return render_template('pages/show_artist.html', artist=data)
 
 #  Update
 #  ----------------------------------------------------------------
