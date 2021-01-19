@@ -24,7 +24,6 @@ moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 migration = Migrate(app, db)
-manager.add_command('db',MigrateCommand)
 
 
 class Venue(db.Model):
@@ -135,13 +134,12 @@ def venues():
     city = location[0]
     state = location[1]
 
-    location_data = {
-      "city" : city,
+    location_data= {
+      "city": city,
       "state": state,
-      "venues":[]
-
+      "venues": []
     }
-    venues = Venue.query.filter_by(city = city , state = state).all()
+    venues= Venue.query.filter_by(city = city , state = state).all()
     upcoming_shows =( Show.query.filter_by(venue_id = venue_id).filter(show_time > curent_time)
                                                               .all())
 
