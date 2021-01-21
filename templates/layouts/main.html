@@ -85,7 +85,7 @@
 <main id="content" role="main" class="container">
     {% with messages = get_flashed_messages() %}
     {% if messages %}
-    {% for message in messages}
+    {% for message in messages %}
     <div class="alert alert-block alert-info fade in">
         <a class="close" data-dismiss="alert">&times;</a>
         {{message}}
