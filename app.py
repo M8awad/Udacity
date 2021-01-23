@@ -47,41 +47,20 @@ def index():
 
 @app.route('/venues')
 def venues():
-    data = []
-    venues = Venue.query.all()
+  data=[]
+  cities = db.session.query(Venue.city, Venue.state).distinct(Venue.city, Venue.state)
+  
+  for city in cities:
+    venues_in_city = db.session.query(Venue.id, Venue.name).filter(Venue.city == city[0]).filter(Venue.state == city[1])
+    data.append({
+      "city": city[0],
+      "state": city[1],
+      "venues" : venues_in_city
+    })
+  return render_template('pages/venues.html', areas=data)  
 
-    locations = set()
-
-    for venue in venues:
-        locations.add((venue.city, venue.state))
-
-    for location in locations:
-        data.append({
-        "city": location[0],
-        "state": location[1],
-        "venues": []
-        })
-
-    for venue in venues:
-        num_upcoming_shows = 0
-
-        shows = Show.query.filter_by(venue_id=venue.id).all()
-
-        current_date = datetime.now()
-
-    for show in shows:
-      if show.start_time > current_date:
-          num_upcoming_shows += 1
-
-    for venue_location in data:
-        if venue.state == venue_location['state'] and venue.city == venue_location['city']:
-            venue_location['venues'].append({
-              "id": venue.id,
-              "name": venue.name,
-              "num_upcoming_shows": num_upcoming_shows
-            })
-    return render_template('pages/venues.html', areas=data)
-
+  
+    
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
